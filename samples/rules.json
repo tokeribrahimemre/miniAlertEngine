@@ -2,5 +2,32 @@
   { "id": "too-high", "type": "threshold", "operator": "gt", "value": 110 },
   { "id": "too-low", "type": "threshold", "operator": "lt", "value": 90 },
   { "id": "fast-move", "type": "change", "percent": 5 },
-  { "id": "safe-band", "type": "range", "min": 95, "max": 105 }
+  { "id": "safe-band", "type": "range", "min": 95, "max": 105 },
+  {
+    "id": "spike-outside-band",
+    "type": "and",
+    "rules": [
+      { "type": "change", "percent": 10 },
+      { "type": "range", "min": 95, "max": 105 }
+    ]
+  },
+  {
+    "id": "calm-market",
+    "type": "not",
+    "rule": { "type": "change", "percent": 5 }
+  },
+  {
+    "id": "extreme-zone",
+    "type": "or",
+    "rules": [
+      { "type": "threshold", "operator": "gt", "value": 120 },
+      {
+        "type": "and",
+        "rules": [
+          { "type": "threshold", "operator": "lt", "value": 95 },
+          { "type": "not", "rule": { "type": "range", "min": 90, "max": 110 } }
+        ]
+      }
+    ]
+  }
 ]

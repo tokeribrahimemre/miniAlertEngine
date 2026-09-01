@@ -48,7 +48,20 @@ Fiyatlar zamana göre sıralanır ve saat saat gezilir; her eşleşmede şu form
   { "id": "too-high",  "type": "threshold", "operator": "gt", "value": 110 },
   { "id": "too-low",   "type": "threshold", "operator": "lt", "value": 90 },
   { "id": "fast-move", "type": "change",    "percent": 5 },
-  { "id": "safe-band", "type": "range",     "min": 95, "max": 105 }
+  { "id": "safe-band", "type": "range",     "min": 95, "max": 105 },
+  {
+    "id": "spike-outside-band",
+    "type": "and",
+    "rules": [
+      { "type": "change", "percent": 10 },
+      { "type": "range", "min": 95, "max": 105 }
+    ]
+  },
+  {
+    "id": "calm-market",
+    "type": "not",
+    "rule": { "type": "change", "percent": 5 }
+  }
 ]
 ```
 
@@ -59,6 +72,45 @@ Fiyatlar zamana göre sıralanır ve saat saat gezilir; her eşleşmede şu form
 | `threshold` | `operator` (`gt`/`lt`), `value` | Fiyat eşiğin üstüne çıkınca (`gt`) veya altına inince (`lt`) eşleşir. Eşitlik eşleşmez. |
 | `change` | `percent` | Fiyat bir önceki saate göre mutlak olarak `%percent` veya daha fazla değişince eşleşir (yön bağımsız). |
 | `range` | `min`, `max` | Fiyat `[min, max]` bandının dışına çıkınca eşleşir; sınır değerler bandın içinde sayılır. |
+| `and` | `rules` (dizi) | İçindeki **tüm** kurallar eşleşince eşleşir. |
+| `or` | `rules` (dizi) | İçindeki kurallardan **en az biri** eşleşince eşleşir. |
+| `not` | `rule` (tekil) | İçindeki kural **eşleşmediğinde** eşleşir. |
+
+## Birleşik Kurallar (and / or / not)
+
+Birleşim kuralları **sınırsız derinlikte** iç içe geçebilir (`and` içinde `or`,
+onun içinde `not` vb.):
+
+```json
+{
+  "id": "extreme-zone",
+  "type": "or",
+  "rules": [
+    { "type": "threshold", "operator": "gt", "value": 120 },
+    {
+      "type": "and",
+      "rules": [
+        { "type": "threshold", "operator": "lt", "value": 95 },
+        { "type": "not", "rule": { "type": "range", "min": 90, "max": 110 } }
+      ]
+    }
+  ]
+}
+```
+
+Kurallar:
+
+- **`id` yalnızca kök kurallarda zorunludur.** İç kurallar `id` ve mesaj taşımaz;
+  fabrika onlara anonim kimlik atar.
+- **İç kurallar asla kendi başına bildirim basmaz.** Değerlendirme sonuçları
+  yalnızca birleşimin kararı için sinyal olarak kullanılır; eşleşme durumunda tek
+  bildirim, kök kuralın `id`'siyle üretilir. Bu davranış
+  `CompositeRuleTests.Motor_IcKurallarAslaKendiBasinaBildirimBasmaz` testiyle
+  sabitlenmiştir.
+- `change` gibi önceki fiyata bağımlı kurallar birleşim içinde de aynı "bir
+  önceki saat" değerini alır. Dolayısıyla ilk saatte `not(change)` eşleşir,
+  çünkü `change` ilk saatte hiçbir zaman eşleşmez (aşağıdaki tasarım kararına
+  bakınız).
 
 ## Tasarım Kararı: `change` Kuralı İlk Saatte Ne Yapar?
 

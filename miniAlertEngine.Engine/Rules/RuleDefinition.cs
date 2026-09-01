@@ -8,8 +8,9 @@ namespace MiniAlertEngine.Rules;
 /// </summary>
 public class RuleDefinition
 {
+    /// <summary>Kök kurallarda zorunlu; birleşim içindeki iç kurallarda opsiyoneldir.</summary>
     [JsonPropertyName("id")]
-    public required string Id { get; init; }
+    public string? Id { get; init; }
 
     [JsonPropertyName("type")]
     public required string Type { get; init; }
@@ -33,4 +34,12 @@ public class RuleDefinition
     /// <summary>range: bandın üst sınırı.</summary>
     [JsonPropertyName("max")]
     public decimal? Max { get; init; }
+
+    /// <summary>and/or: birleştirilecek iç kurallar (sınırsız derinlikte iç içe geçebilir).</summary>
+    [JsonPropertyName("rules")]
+    public List<RuleDefinition>? Rules { get; init; }
+
+    /// <summary>not: terslenecek tek iç kural.</summary>
+    [JsonPropertyName("rule")]
+    public RuleDefinition? Rule { get; init; }
 }

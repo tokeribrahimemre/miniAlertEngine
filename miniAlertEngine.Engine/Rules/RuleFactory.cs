@@ -5,25 +5,54 @@ namespace MiniAlertEngine.Rules;
 /// </summary>
 public static class RuleFactory
 {
-    public static IRule Create(RuleDefinition definition) => definition.Type switch
+    /// <summary>Kök seviye kural üretir; kök kuralda 'id' zorunludur.</summary>
+    public static IRule Create(RuleDefinition definition) =>
+        CreateCore(definition, isRoot: true);
+
+    private static IRule CreateCore(RuleDefinition definition, bool isRoot)
     {
-        "threshold" => new ThresholdRule(
-            definition.Id,
-            definition.Operator ?? throw Missing(definition.Id, "operator"),
-            definition.Value ?? throw Missing(definition.Id, "value")),
+        if (isRoot && string.IsNullOrWhiteSpace(definition.Id))
+            throw new InvalidOperationException("Kök kuralda 'id' alanı zorunludur.");
 
-        "change" => new ChangeRule(
-            definition.Id,
-            definition.Percent ?? throw Missing(definition.Id, "percent")),
+        // İç kuralların id'si yoktur; sinyal amaçlı anonim kimlik verilir.
+        var id = definition.Id ?? "<anon>";
 
-        "range" => new RangeRule(
-            definition.Id,
-            definition.Min ?? throw Missing(definition.Id, "min"),
-            definition.Max ?? throw Missing(definition.Id, "max")),
+        return definition.Type switch
+        {
+            "threshold" => new ThresholdRule(
+                id,
+                definition.Operator ?? throw Missing(id, "operator"),
+                definition.Value ?? throw Missing(id, "value")),
 
-        var other => throw new InvalidOperationException(
-            $"Kural '{definition.Id}': bilinmeyen tip '{other}'. Desteklenenler: threshold, change, range.")
-    };
+            "change" => new ChangeRule(
+                id,
+                definition.Percent ?? throw Missing(id, "percent")),
+
+            "range" => new RangeRule(
+                id,
+                definition.Min ?? throw Missing(id, "min"),
+                definition.Max ?? throw Missing(id, "max")),
+
+            "and" => new AndRule(
+                id,
+                CreateChildren(definition, id)),
+
+            "or" => new OrRule(
+                id,
+                CreateChildren(definition, id)),
+
+            "not" => new NotRule(
+                id,
+                CreateCore(definition.Rule ?? throw Missing(id, "rule"), isRoot: false)),
+
+            var other => throw new InvalidOperationException(
+                $"Kural '{id}': bilinmeyen tip '{other}'. Desteklenenler: threshold, change, range, and, or, not.")
+        };
+    }
+
+    private static IEnumerable<IRule> CreateChildren(RuleDefinition definition, string parentId) =>
+        (definition.Rules ?? throw Missing(parentId, "rules"))
+            .Select(child => CreateCore(child, isRoot: false));
 
     private static InvalidOperationException Missing(string ruleId, string field) =>
         new($"Kural '{ruleId}': zorunlu alan '{field}' eksik.");
