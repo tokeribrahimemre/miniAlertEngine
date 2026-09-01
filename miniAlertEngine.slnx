@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="miniAlertEngine.Engine/miniAlertEngine.Engine.csproj" />
+  <Project Path="miniAlertEngine.Tests/miniAlertEngine.Tests.csproj" />
+  <Project Path="miniAlertEngine/miniAlertEngine.csproj" />
+</Solution>

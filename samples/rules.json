@@ -1,0 +1,6 @@
+[
+  { "id": "too-high", "type": "threshold", "operator": "gt", "value": 110 },
+  { "id": "too-low", "type": "threshold", "operator": "lt", "value": 90 },
+  { "id": "fast-move", "type": "change", "percent": 5 },
+  { "id": "safe-band", "type": "range", "min": 95, "max": 105 }
+]
