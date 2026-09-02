@@ -25,4 +25,13 @@ public class NotRule : IRule
         var message = "İç kural sağlanmadı (koşulun tersi geçerli)";
         return new Alert(current.Time, Id, message, current.Price);
     }
+
+    public Alert? Evaluate(PricePoint current, PricePoint? previous, EvaluationContext context)
+    {
+        if (Rule.Evaluate(current, previous, context) is not null)
+            return null;
+
+        var message = "İç kural sağlanmadı (koşulun tersi geçerli)";
+        return new Alert(current.Time, Id, message, current.Price);
+    }
 }

@@ -29,5 +29,12 @@
         ]
       }
     ]
+  },
+  { "id": "down-trend", "type": "streak", "hours": 2, "direction": "down" },
+  {
+    "id": "band-alert-limited",
+    "type": "cooldown",
+    "hours": 3,
+    "rule": { "type": "range", "min": 95, "max": 105 }
   }
 ]

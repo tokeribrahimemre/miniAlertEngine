@@ -32,4 +32,16 @@ public class AndRule : IRule
         var message = $"Tüm koşullar sağlandı ({Rules.Count} kuralın tamamı eşleşti)";
         return new Alert(current.Time, Id, message, current.Price);
     }
+
+    public Alert? Evaluate(PricePoint current, PricePoint? previous, EvaluationContext context)
+    {
+        foreach (var rule in Rules)
+        {
+            if (rule.Evaluate(current, previous, context) is null)
+                return null;
+        }
+
+        var message = $"Tüm koşullar sağlandı ({Rules.Count} kuralın tamamı eşleşti)";
+        return new Alert(current.Time, Id, message, current.Price);
+    }
 }

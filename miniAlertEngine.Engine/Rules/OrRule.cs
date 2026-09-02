@@ -34,4 +34,18 @@ public class OrRule : IRule
 
         return null;
     }
+
+    public Alert? Evaluate(PricePoint current, PricePoint? previous, EvaluationContext context)
+    {
+        foreach (var rule in Rules)
+        {
+            if (rule.Evaluate(current, previous, context) is not null)
+            {
+                var message = "Koşullardan en az biri sağlandı";
+                return new Alert(current.Time, Id, message, current.Price);
+            }
+        }
+
+        return null;
+    }
 }

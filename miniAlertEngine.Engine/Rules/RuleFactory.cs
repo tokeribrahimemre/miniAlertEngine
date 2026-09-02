@@ -45,8 +45,18 @@ public static class RuleFactory
                 id,
                 CreateCore(definition.Rule ?? throw Missing(id, "rule"), isRoot: false)),
 
+            "streak" => new StreakRule(
+                id,
+                definition.Hours ?? throw Missing(id, "hours"),
+                definition.Direction ?? throw Missing(id, "direction")),
+
+            "cooldown" => new CooldownRule(
+                id,
+                definition.Hours ?? throw Missing(id, "hours"),
+                CreateCore(definition.Rule ?? throw Missing(id, "rule"), isRoot: false)),
+
             var other => throw new InvalidOperationException(
-                $"Kural '{id}': bilinmeyen tip '{other}'. Desteklenenler: threshold, change, range, and, or, not.")
+                $"Kural '{id}': bilinmeyen tip '{other}'. Desteklenenler: threshold, change, range, and, or, not, streak, cooldown.")
         };
     }
 

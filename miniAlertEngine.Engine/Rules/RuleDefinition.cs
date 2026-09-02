@@ -39,7 +39,15 @@ public class RuleDefinition
     [JsonPropertyName("rules")]
     public List<RuleDefinition>? Rules { get; init; }
 
-    /// <summary>not: terslenecek tek iç kural.</summary>
+    /// <summary>not/cooldown: sarılacak/terslenecek tek iç kural.</summary>
     [JsonPropertyName("rule")]
     public RuleDefinition? Rule { get; init; }
+
+    /// <summary>streak/cooldown: saat cinsinden süre (streak'te geçiş sayısı).</summary>
+    [JsonPropertyName("hours")]
+    public int? Hours { get; init; }
+
+    /// <summary>streak: "up" veya "down".</summary>
+    [JsonPropertyName("direction")]
+    public string? Direction { get; init; }
 }
