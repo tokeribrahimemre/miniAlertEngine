@@ -1,40 +1,69 @@
-[
-  { "id": "too-high", "type": "threshold", "operator": "gt", "value": 110 },
-  { "id": "too-low", "type": "threshold", "operator": "lt", "value": 90 },
-  { "id": "fast-move", "type": "change", "percent": 5 },
-  { "id": "safe-band", "type": "range", "min": 95, "max": 105 },
-  {
-    "id": "spike-outside-band",
-    "type": "and",
-    "rules": [
-      { "type": "change", "percent": 10 },
-      { "type": "range", "min": 95, "max": 105 }
-    ]
-  },
-  {
-    "id": "calm-market",
-    "type": "not",
-    "rule": { "type": "change", "percent": 5 }
-  },
-  {
-    "id": "extreme-zone",
-    "type": "or",
-    "rules": [
-      { "type": "threshold", "operator": "gt", "value": 120 },
-      {
-        "type": "and",
-        "rules": [
-          { "type": "threshold", "operator": "lt", "value": 95 },
-          { "type": "not", "rule": { "type": "range", "min": 90, "max": 110 } }
-        ]
-      }
-    ]
-  },
-  { "id": "down-trend", "type": "streak", "hours": 2, "direction": "down" },
-  {
-    "id": "band-alert-limited",
-    "type": "cooldown",
-    "hours": 3,
-    "rule": { "type": "range", "min": 95, "max": 105 }
-  }
-]
+{
+  "rules": [
+    {
+      "id": "price-above-3000",
+      "type": "threshold",
+      "operator": "gt",
+      "value": 3000,
+      "message": "Price exceeded 3000 TRY/MWh."
+    },
+    {
+      "id": "price-below-100",
+      "type": "threshold",
+      "operator": "lt",
+      "value": 100,
+      "message": "Price dropped below 100 TRY/MWh."
+    },
+    {
+      "id": "hourly-jump-20",
+      "type": "change",
+      "percent": 20,
+      "message": "Price moved more than 20% versus the previous hour."
+    },
+    {
+      "id": "outside-normal-band",
+      "type": "range",
+      "min": 0,
+      "max": 3500,
+      "message": "Price left the [0, 3500] band."
+    },
+    {
+      "id": "expensive-and-volatile",
+      "type": "and",
+      "message": "High price combined with a sharp hourly move.",
+      "rules": [
+        { "type": "threshold", "operator": "gt", "value": 2500 },
+        { "type": "change", "percent": 10 }
+      ]
+    },
+    {
+      "id": "abnormal-market",
+      "type": "or",
+      "message": "Market is behaving abnormally.",
+      "rules": [
+        { "type": "threshold", "operator": "lt", "value": 0 },
+        { "type": "change", "percent": 50 }
+      ]
+    },
+    {
+      "id": "outside-comfort-zone",
+      "type": "not",
+      "message": "Price is outside the comfortable trading zone.",
+      "rule": { "type": "range", "min": 1200, "max": 3200 }
+    },
+    {
+      "id": "three-hour-rise",
+      "type": "streak",
+      "direction": "up",
+      "hours": 3,
+      "message": "Price increased three hours in a row."
+    },
+    {
+      "id": "spike-alarm-with-cooldown",
+      "type": "cooldown",
+      "hours": 6,
+      "message": "Spike alarm (fires at most once per 6 hours).",
+      "rule": { "type": "threshold", "operator": "gt", "value": 2800 }
+    }
+  ]
+}
